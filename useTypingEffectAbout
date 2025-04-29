@@ -1,0 +1,138 @@
+import { useEffect, useState } from "react"
+import { Override } from "framer"
+
+/**
+ * Override: Simulates a typing animation for an "About" blurb.
+ * - Blinks the cursor before typing starts
+ * - Types out the full sentence character-by-character
+ * - Blinks the cursor again after typing completes
+ * - Adjusts font size and layout responsively
+ *
+ * Intended for use on a text layer in Framer.
+ */
+export function UseTypingEffectAbout(): Override {
+    const fullText =
+        "I’m a product manager blending design craft, product sense, and operational rigor to build products that spark creativity, collaboration, and community."
+
+    const [index, setIndex] = useState(0)
+    const [started, setStarted] = useState(false)
+    const [typingComplete, setTypingComplete] = useState(false)
+    const [cursorVisible, setCursorVisible] = useState(true)
+
+    // Responsive layout
+    const [fontSize, setFontSize] = useState(20)
+    const [lineHeight, setLineHeight] = useState(28)
+    const [minHeight, setMinHeight] = useState("6.6em") // fallback if JS fails
+    const [isLargeScreen, setIsLargeScreen] = useState(false)
+
+    /**
+     * Cursor pre-blink before typing starts
+     */
+    useEffect(() => {
+        if (!started) {
+            const preBlinkInterval = setInterval(() => {
+                setCursorVisible((prev) => !prev)
+            }, 500)
+
+            const startTimeout = setTimeout(() => {
+                setStarted(true)
+                setCursorVisible(true)
+            }, 2200)
+
+            return () => {
+                clearInterval(preBlinkInterval)
+                clearTimeout(startTimeout)
+            }
+        }
+    }, [started])
+
+    /**
+     * Typing effect: reveals one character at a time
+     */
+    useEffect(() => {
+        if (!started) return
+
+        const typingInterval = setInterval(() => {
+            setIndex((prev) => {
+                const next = prev + 1
+                if (next >= fullText.length) {
+                    clearInterval(typingInterval)
+                    setTypingComplete(true)
+                }
+                return next
+            })
+        }, 20)
+
+        return () => clearInterval(typingInterval)
+    }, [started])
+
+    /**
+     * Cursor blinking after typing is complete
+     */
+    useEffect(() => {
+        if (typingComplete) {
+            const blinkInterval = setInterval(() => {
+                setCursorVisible((prev) => !prev)
+            }, 500)
+            return () => clearInterval(blinkInterval)
+        }
+    }, [typingComplete])
+
+    /**
+     * Responsive styling based on screen size
+     */
+    useEffect(() => {
+        const handleResize = () => {
+            const large = window.innerWidth >= 810
+            setIsLargeScreen(large)
+            const newFontSize = large ? 20 : 16
+            const newLineHeight = large ? 28 : 24
+            setFontSize(newFontSize)
+            setLineHeight(newLineHeight)
+            setMinHeight(`${newLineHeight * 7}px`)
+        }
+
+        if (typeof window !== "undefined") {
+            window.addEventListener("resize", handleResize)
+            handleResize()
+        }
+
+        return () => {
+            if (typeof window !== "undefined") {
+                window.removeEventListener("resize", handleResize)
+            }
+        }
+    }, [])
+
+    // Cursor bar style
+    const cursorStyle = {
+        display: "inline-block",
+        width: "1ch",
+        opacity: cursorVisible ? 1 : 0,
+        transform: isLargeScreen ? "scaleY(1.2) translateY(-1px)" : "none",
+        transformOrigin: "center",
+    }
+
+    const visibleText = fullText.slice(0, index)
+
+    return {
+        children: (
+            <span
+                style={{
+                    display: "inline-block",
+                    minHeight: minHeight,
+                    fontFamily: "'Inter Tight', sans-serif",
+                    fontWeight: 700,
+                    fontSize: `${fontSize}px`,
+                    lineHeight: `${lineHeight}px`,
+                    whiteSpace: "normal",
+                    fontFeatureSettings: "'tnum' 1",
+                    color: "#1B1B1B",
+                }}
+            >
+                {visibleText}
+                <span style={cursorStyle}>▍</span>
+            </span>
+        ),
+    }
+}
