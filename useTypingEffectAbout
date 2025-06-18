@@ -12,7 +12,7 @@ import { Override } from "framer"
  */
 export function UseTypingEffectAbout(): Override {
     const fullText =
-        "I’m a design-native product manager building products that spark creativity, collaboration, and community."
+        "I'm a Fractional Product Lead driving strategy, execution, and go-to-market for early-stage product teams."
 
     const [index, setIndex] = useState(0)
     const [started, setStarted] = useState(false)
