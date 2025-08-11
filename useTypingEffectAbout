@@ -12,7 +12,7 @@ import { Override } from "framer"
  */
 export function UseTypingEffectAbout(): Override {
     const fullText =
-        "I'm a Fractional Product Lead driving strategy, execution, and go-to-market for early-stage product teams."
+        "I'm a Product Lead driving strategy, execution, and go-to-market for early-stage product teams."
 
     const [index, setIndex] = useState(0)
     const [started, setStarted] = useState(false)
@@ -89,7 +89,7 @@ export function UseTypingEffectAbout(): Override {
             const newLineHeight = large ? 28 : 24
             setFontSize(newFontSize)
             setLineHeight(newLineHeight)
-            setMinHeight(`${newLineHeight * 6}px`)
+            setMinHeight(`${newLineHeight * 4}px`)
         }
 
         if (typeof window !== "undefined") {
